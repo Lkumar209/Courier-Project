@@ -1,4 +1,4 @@
-import tkinter as tk
+import Tkinter as tk
 
 class FoodCalorieCounter:
     def __init__(self, master):
