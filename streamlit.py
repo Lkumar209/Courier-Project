@@ -2,96 +2,54 @@ import streamlit as st
 from datetime import date, timedelta
 import pandas as pd
 import plotly.graph_objs as go
- 
 
-data = []
-
-def add_data(name, calories, date):
-    new_item = {'Name': name, 'Calories': calories, 'Date': date}
-    data.append(new_item)
-
-
-def calculate_daily_calories(age, gender, height_cm, weight_kg, activity_level):
-    if gender == 'Male':
-        bmr = 10 * weight_kg + 6.25 * height_cm - 5 * age + 5
-    else:
-        bmr = 10 * weight_kg + 6.25 * height_cm - 5 * age - 161
-    if activity_level == 'Sedentary':
-        tdee = bmr * 1.2
-    elif activity_level == 'Lightly Active':
-        tdee = bmr * 1.375
-    elif activity_level == 'Moderately Active':
-        tdee = bmr * 1.55
-    elif activity_level == 'Very Active':
-        tdee = bmr * 1.725
-    else:
-        tdee = bmr * 1.9
-    return tdee
-
-# Define a function to plot the calorie data on a graph
-def plot_data():
-    df = pd.DataFrame(data)
-
-    daily_calories = df.groupby('Date').sum()['Calories']
-
-    age = st.session_state.age
-    gender = st.session_state.gender
-    height_cm = st.session_state.height_cm
-    weight_kg = st.session_state.weight_kg
-    activity_level = st.session_state.activity_level
-    tdee = calculate_daily_calories(age, gender, height_cm, weight_kg, activity_level)
-
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=daily_calories.index, y=daily_calories.values, name='Calories'))
-    fig.add_trace(go.Scatter(x=daily_calories.index, y=[tdee] * len(daily_calories), name='Recommended'))
-    fig.update_layout(title='Calorie Tracker', xaxis_title='Date', yaxis_title='Calories')
-    st.plotly_chart(fig)
-
-# Define the Streamlit app
-def app():
-    st.set_page_config(layout='wide')
-
-    menu = ['Calorie Tracker', 'Food Log', 'Recommended Calorie Intake']
-
-    choice = st.sidebar.selectbox('Select an option', menu)
+# Set up the home page
+def home():
+    st.title("CALORIE TRACKER")
+    st.write("Welcome to the Calorie Tracker! Use the sidebar to navigate to different pages.")
     
-    #calorie tracker where user can add data
-    if choice == 'Calorie Tracker':
-        st.title('Calorie Tracker')
+# Set up the food log page
+def food_log():
+    st.title("Food Log")
+    
+    # Create the form for adding a new food entry
+    st.write("Add a new entry")
+    with st.form("new_entry_form"):
+        food_name = st.text_input("Food name")
+        calories = st.number_input("Calories", min_value=0, step=1)
+        date_consumed = st.date_input("Date consumed")
+        submit_button = st.form_submit_button("Submit")
+    
+    # Add the new entry to the food log file
+    if submit_button:
+        new_entry = {"Food": food_name, "Calories": calories, "Date": date_consumed.strftime("%m/%d/%Y")}
+        with open("food_log.csv", "a") as f:
+            f.write(f"{new_entry['Food']},{new_entry['Calories']},{new_entry['Date']}\n")
+    
+    # Load the food log file into a DataFrame and display it
+    try:
+        df = pd.read_csv("food_log.csv", names=["Food", "Calories", "Date"])
+        st.write(df)
+    except FileNotFoundError:
+        st.write("No food entries yet.")
+        
+# Set up the exercise log page - laxya add this
+def exercise_log():
+    st.title("Exercise Log")
 
-        name = st.text_input('Food name')
-        calories = st.number_input('Calories', step=1, min_value=0)
-        date = st.date_input('Date')
+# Set up the sidebar navigation
+sidebar_options = {
+    "Home": home,
+    "Food Log": food_log,
+    "Exercise Log": exercise_log
+}
 
-        if st.button('Add'):
-            add_data(name, calories, date)
-            st.success('Food data added successfully!')
-
-    # Define the Food Log section
-    elif choice == 'Food Log':
-        st.title('Food Log')
-        # Add a table to show the food data
-        df = pd.DataFrame(data)
-        st.dataframe(df)
-
-    # Define the Recommended Calorie Intake section
-    elif choice == 'Recommended Calorie Intake':
-        st.title('Recommended Calorie Intake')
-
-        age = st.number_input('Age', step=1, min_value=1, max_value=120)
-        gender = st.selectbox('Gender', ['Male', 'Female'])
-        height_cm = st.number_input('Height (cm)', step=1, min_value=1, max_value=300)
-        weight_kg = st.number_input('Weight (kg)', step=0.1, min_value=0.1, max_value=1000.0)
-        activity_level = st.selectbox('Activity Level', ['Sedentary', 'Lightly Active', 'Moderately Active', 'Very Active', 'Extra Active'])
-
-        st.session_state.age = age
-        st.session_state.gender = gender
-        st.session_state.height_cm = height_cm
-        st.session_state.weight_kg = weight_kg
-        st.session_state.activity_level = activity_level
-
-        plot_data()
+# Set up the page layout
+def page_layout():
+    st.sidebar.title("Navigation")
+    page = st.sidebar.radio("", list(sidebar_options.keys()))
+    sidebar_options[page]()
 
 # Run the Streamlit app
 if __name__ == '__main__':
-    app()
+    page_layout()
