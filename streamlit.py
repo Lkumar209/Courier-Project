@@ -31,6 +31,7 @@ def fetch_calories(prediction):
         url = 'https://www.google.com/search?&q=calories in ' + prediction
         req = requests.get(url).text
         scrap = BeautifulSoup(req, 'html.parser')
+        print(scrap)
         calories = scrap.find("div", class_="BNeawe iBp4i AP7Wnd").text
         return calories
     except Exception as e:
@@ -95,14 +96,15 @@ def checkCalories():
                 st.info('**Category : Fruit**')
             st.success("**Predicted : " + result + '**')
 
-            st.warning('**Calories : ' + str(50) + 'calories per 100 grams**')
+            cal = 50
             #cal = fetch_calories(result)
-            #if cal:
-            #    st.warning('**' + cal + '(100 grams)**')
+            if cal:
+               st.warning('**' + str(cal) + '(100 grams)**')
+
             today = date.today()
             d1 = today.strftime("%d/%m/%Y")
-            
-            new_entry = {"Food": result, "Calories": 50, "Date": d1}
+
+            new_entry = {"Food": result, "Calories": cal, "Date": d1}
             with open("food_log.csv", "a") as f:
                 f.write(f"{new_entry['Food']},{new_entry['Calories']},{new_entry['Date']}\n")
 
