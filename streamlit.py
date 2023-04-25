@@ -57,6 +57,7 @@ def processed_img(img_path):
 def home():
     st.title("CALORIE TRACKER")
     st.write("Welcome to the Calorie Tracker! Use the sidebar to navigate to different pages.")
+    st.image("logo.png")
     
 # Set up the add food page
 def add_food():
@@ -77,7 +78,7 @@ def add_food():
             f.write(f"{new_entry['Food']},{new_entry['Calories']},{new_entry['Date']}\n")
         
 def checkCalories():
-    st.title("Fruits-Vegetable Classification")
+    st.title("Apload ")
     img_file = st.file_uploader("Choose an Image", type=["jpg", "png"])
     if img_file is not None:
         img = Image.open(img_file).resize((300, 250))
