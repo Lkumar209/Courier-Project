@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Send a Message</title>
+</head>
+<body>
+	<h1>Send a Message</h1>
+	<form onsubmit="sendMessage(); return false;">
+		<label for="email">Email address:</label>
+		<input type="email" name="email" id="email" required><br><br>
+		<label for="message">Message:</label><br>
+		<textarea name="message" id="message" rows="5" cols="50" required></textarea><br><br>
+		<input type="submit" value="Send Message">
+	</form>
+
+	<script src="https://cdn.jsdelivr.net/npm/@trycourier/courier@2.1.0/dist/courier.min.js"></script>
+	<script>
+		function sendMessage() {
+			// Get form data
+			var email = document.getElementById("email").value;
+			var message = document.getElementById("message").value;
+
+			// Initialize Courier client
+			var client = Courier("pk_prod_E7E2HD1Q3V4ZYJM9D4BHK5RZQFYW");
+
+			// Construct message payload
+			var payload = {
+				"to": {
+					"email": email
+				},
+				"content": {
+					"title": "New Message",
+					"body": message
+				}
+			};
+
+			// Send message
+			client.send(payload)
+				.then(function(response) {
+					// Check for success
+					if (response.status == "success") {
+						alert("Message sent!");
+					} else {
+						alert("Error sending message: " + response.errors[0].message);
+					}
+				})
+				.catch(function(error) {
+					alert("Error sending message: " + error.message);
+				});
+		}
+	</script>
+</body>
+</html>
