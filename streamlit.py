@@ -100,7 +100,7 @@ def checkCalories():
             cal = 50
             #cal = fetch_calories(result)
             if cal:
-               st.warning('**' + str(cal) + '(100 grams)**')
+               st.warning('**Calories: ' + str(cal) + 'per 100 grams of the food**')
 
             today = date.today()
             d1 = today.strftime("%d/%m/%Y")
