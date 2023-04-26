@@ -78,7 +78,7 @@ def add_food():
             f.write(f"{new_entry['Food']},{new_entry['Calories']},{new_entry['Date']}\n")
         
 def checkCalories():
-    st.title("Apload ")
+    st.title("Upload")
     img_file = st.file_uploader("Choose an Image", type=["jpg", "png"])
     if img_file is not None:
         img = Image.open(img_file).resize((300, 250))
